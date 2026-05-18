@@ -4,7 +4,7 @@ import type { LoginForm, RegisterForm } from "../../interfaces/user";
 import TextField from "../ui/TextField";
 
 type AuthMode = "login" | "register";
-
+// cjamhe
 interface AuthScreenProps {
   authMessage: string;
   loginForm: LoginForm;
