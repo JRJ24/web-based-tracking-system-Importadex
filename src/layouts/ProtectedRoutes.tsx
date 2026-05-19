@@ -1,29 +1,26 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useUsersAuthStore } from "@/context/Auth";
+import { useTracking } from "../context/TrackingContext";
 
-interface Props {
+interface ProtectedRouteProps {
   allowedRoles?: string[];
   forbiddenRoles?: string[];
 }
 
-const ProtectedRoute = ({ allowedRoles, forbiddenRoles }: Props) => {
-  const user = useUsersAuthStore();
+export default function ProtectedRoute({ allowedRoles, forbiddenRoles }: ProtectedRouteProps) {
+  const { authUser } = useTracking();
+  const role = authUser?.role || "";
 
-  const isAuthenticated = !!user.token; 
-  const userRole = user.user?.role;
-
-  if (!isAuthenticated) {
+  if (!authUser) {
     return <Navigate replace to="/login" />;
-  } 
-
-  if (forbiddenRoles && forbiddenRoles.includes(userRole || "")) {
-    return <Navigate to="/NO-PERMISSION" replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(userRole || "")) {
-    return <Navigate to="/NO-AUTHORIZED" replace />; 
+  if (forbiddenRoles?.includes(role)) {
+    return <Navigate replace to="/no-permission" />;
   }
+
+  if (allowedRoles && !allowedRoles.includes(role)) {
+    return <Navigate replace to="/no-authorized" />;
+  }
+
   return <Outlet />;
-};
-
-export default ProtectedRoute;
+}

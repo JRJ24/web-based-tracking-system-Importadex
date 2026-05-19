@@ -1,41 +1,46 @@
-import { createBrowserRouter } from "react-router-dom";
+import { Navigate, createBrowserRouter } from "react-router-dom";
 import AppLayout from "./layouts/AppLayout";
-// import AuthLayout from "./layouts/AuthLayout";
 import ProtectedRoute from "./layouts/ProtectedRoutes";
-
-// import LoginPage from "./pages/LoginPage";
-// import RegisterPage from "./pages/RegisterPage";
+import LoginPage from "./pages/LoginPage";
+import MaintenancePage from "./pages/MaintenancePage";
 import OrdersPage from "./pages/OrdersPage";
 import ReportsPage from "./pages/ReportsPage";
-import MaintenancePage from "./pages/MaintenancePage";
+
+const protectedRoutes = [
+  { index: true, element: <Navigate replace to="/orders" /> },
+  { path: "orders", element: <OrdersPage /> },
+  { path: "reports", element: <ReportsPage /> },
+  {
+    element: <ProtectedRoute allowedRoles={["Administrador"]} />,
+    children: [{ path: "maintenance", element: <MaintenancePage /> }],
+  },
+];
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <ProtectedRoute forbiddenRoles={["USER"]} />,
+    element: <ProtectedRoute />,
     children: [
       {
         element: <AppLayout />,
-        children: [
-          { index: true, element: <OrdersPage /> },
-          { path: "orders", element: <OrdersPage /> },
-          { path: "reports", element: <ReportsPage /> },
-          {
-            element: <ProtectedRoute allowedRoles={["Administrador"]} />,
-            children: [{ path: "maintenance", element: <MaintenancePage /> }],
-          },
-        ],
+        children: protectedRoutes,
       },
     ],
   },
-  // {
-  //   path: "/login",
-  //   element: <AuthLayout />,
-  //   children: [{ index: true, element: <LoginPage /> }],
-  // },
-  // {
-  //   path: "/register",
-  //   element: <AuthLayout />,
-  //   children: [{ index: true, element: <RegisterPage /> }],
-  // },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/no-authorized",
+    element: <LoginPage />,
+  },
+  {
+    path: "/no-permission",
+    element: <LoginPage />,
+  },
+  {
+    path: "*",
+    element: <Navigate replace to="/" />,
+  },
 ]);
